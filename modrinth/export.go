@@ -40,7 +40,18 @@ var exportCmd = &cobra.Command{
 			fmt.Println(err)
 			return
 		}
-		if err = core.CommitChanges(&index, &pack); err != nil {
+		err = index.Write()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		err = pack.UpdateIndexHash()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		err = pack.Write()
+		if err != nil {
 			fmt.Println(err)
 			return
 		}

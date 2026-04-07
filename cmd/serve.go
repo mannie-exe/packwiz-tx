@@ -163,7 +163,16 @@ func doServeRefresh(pack *core.Pack, index *core.Index) error {
 	if err != nil {
 		return err
 	}
-	if err = core.CommitChanges(index, pack); err != nil {
+	err = index.Write()
+	if err != nil {
+		return err
+	}
+	err = pack.UpdateIndexHash()
+	if err != nil {
+		return err
+	}
+	err = pack.Write()
+	if err != nil {
 		return err
 	}
 	fmt.Println("Index refreshed!")

@@ -42,7 +42,7 @@ var removeCmd = &cobra.Command{
 			fmt.Println(err)
 			os.Exit(1)
 		}
-			if err = core.CommitChanges(&index, &pack); err != nil {
+		if err = core.CommitChanges(&index, &pack); err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
