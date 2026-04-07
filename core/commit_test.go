@@ -3,6 +3,7 @@ package core
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/spf13/viper"
@@ -15,7 +16,6 @@ func setupTestPack(t *testing.T) (Index, Pack, string) {
 	packFile := filepath.Join(dir, "pack.toml")
 	indexFile := filepath.Join(dir, "index.toml")
 
-	// Write minimal pack.toml
 	err := os.WriteFile(packFile, []byte(`name = "test-pack"
 pack-format = "packwiz:1.1.0"
 
@@ -31,7 +31,6 @@ minecraft = "1.21.1"
 		t.Fatal(err)
 	}
 
-	// Write minimal index.toml
 	err = os.WriteFile(indexFile, []byte(`hash-format = "sha256"
 `), 0644)
 	if err != nil {
@@ -39,6 +38,8 @@ minecraft = "1.21.1"
 	}
 
 	viper.Set("pack-file", packFile)
+	t.Cleanup(func() { viper.Set("pack-file", nil) })
+
 	pack, err := LoadPack()
 	if err != nil {
 		t.Fatal(err)
@@ -57,7 +58,6 @@ func TestCommitChangesWritesWhenNoRefreshFalse(t *testing.T) {
 	viper.Set("no-refresh", false)
 	defer viper.Set("no-refresh", nil)
 
-	// Modify index in memory
 	index.HashFormat = "sha512"
 
 	err := CommitChanges(&index, &pack)
@@ -65,12 +65,11 @@ func TestCommitChangesWritesWhenNoRefreshFalse(t *testing.T) {
 		t.Fatalf("CommitChanges should succeed: %v", err)
 	}
 
-	// Verify index.toml was written with the new hash format
 	content, err := os.ReadFile(filepath.Join(dir, "index.toml"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !containsString(string(content), "sha512") {
+	if !strings.Contains(string(content), "sha512") {
 		t.Error("index.toml should contain 'sha512' after CommitChanges")
 	}
 }
@@ -81,7 +80,6 @@ func TestCommitChangesSkipsWhenNoRefreshTrue(t *testing.T) {
 	viper.Set("no-refresh", true)
 	defer viper.Set("no-refresh", nil)
 
-	// Modify index in memory
 	index.HashFormat = "sha512"
 
 	err := CommitChanges(&index, &pack)
@@ -89,38 +87,32 @@ func TestCommitChangesSkipsWhenNoRefreshTrue(t *testing.T) {
 		t.Fatalf("CommitChanges should succeed (no-op): %v", err)
 	}
 
-	// Verify index.toml was NOT written (still has original sha256)
 	content, err := os.ReadFile(filepath.Join(dir, "index.toml"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if containsString(string(content), "sha512") {
+	if strings.Contains(string(content), "sha512") {
 		t.Error("index.toml should NOT contain 'sha512' when --no-refresh is set")
 	}
 }
 
 func TestCommitChangesDefaultsToWrite(t *testing.T) {
-	index, pack, _ := setupTestPack(t)
+	index, pack, dir := setupTestPack(t)
 
-	// Don't set no-refresh at all; should default to false (write)
 	viper.Set("no-refresh", nil)
+
+	index.HashFormat = "sha512"
 
 	err := CommitChanges(&index, &pack)
 	if err != nil {
 		t.Fatalf("CommitChanges should succeed with default config: %v", err)
 	}
-}
 
-func containsString(haystack, needle string) bool {
-	return len(haystack) > 0 && len(needle) > 0 && // avoid trivial matches
-		indexOf(haystack, needle) >= 0
-}
-
-func indexOf(s, substr string) int {
-	for i := 0; i <= len(s)-len(substr); i++ {
-		if s[i:i+len(substr)] == substr {
-			return i
-		}
+	content, err := os.ReadFile(filepath.Join(dir, "index.toml"))
+	if err != nil {
+		t.Fatal(err)
 	}
-	return -1
+	if !strings.Contains(string(content), "sha512") {
+		t.Error("index.toml should contain 'sha512' when no-refresh defaults to false")
+	}
 }
