@@ -80,6 +80,10 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&noRefresh, "no-refresh", false,
 		"Skip index and pack.toml refresh after modifications (use 'packwiz refresh' to finalize batch operations)")
 	_ = viper.BindPFlag("no-refresh", rootCmd.PersistentFlags().Lookup("no-refresh"))
+
+	rootCmd.PersistentFlags().Bool("offline", false,
+		"Skip all network requests; requires pre-resolved metadata via flags (--name, --filename, --hash, etc.)")
+	_ = viper.BindPFlag("offline", rootCmd.PersistentFlags().Lookup("offline"))
 }
 
 // initConfig reads in config file and ENV variables if set.

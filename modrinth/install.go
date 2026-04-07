@@ -36,6 +36,92 @@ var installCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		if viper.GetBool("offline") {
+			name, _ := cmd.Flags().GetString("name")
+			filename, _ := cmd.Flags().GetString("filename")
+			downloadURL, _ := cmd.Flags().GetString("url")
+			hash, _ := cmd.Flags().GetString("hash")
+			hashFormat, _ := cmd.Flags().GetString("hash-format")
+			side, _ := cmd.Flags().GetString("side")
+			slug, _ := cmd.Flags().GetString("slug")
+			projectType, _ := cmd.Flags().GetString("project-type")
+
+			if name == "" || filename == "" || downloadURL == "" || hash == "" || hashFormat == "" {
+				fmt.Println("--offline requires: --name, --filename, --url, --hash, --hash-format")
+				os.Exit(1)
+			}
+			if projectIDFlag == "" {
+				fmt.Println("--offline requires --project-id")
+				os.Exit(1)
+			}
+			if versionIDFlag == "" {
+				fmt.Println("--offline requires --version-id")
+				os.Exit(1)
+			}
+
+			if slug == "" {
+				slug = core.SlugifyName(name)
+			}
+			if side == "" {
+				side = core.UniversalSide
+			}
+
+			updateMap := make(map[string]map[string]interface{})
+			updateMap["modrinth"], err = mrUpdateData{
+				ProjectID:        projectIDFlag,
+				InstalledVersion: versionIDFlag,
+			}.ToMap()
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+
+			folder := viper.GetString("meta-folder")
+			if folder == "" {
+				switch projectType {
+				case "resourcepack":
+					folder = "resourcepacks"
+				case "shader":
+					folder = "shaderpacks"
+				case "datapack":
+					folder = "datapacks"
+				default:
+					folder = "mods"
+				}
+			}
+
+			modMeta := core.Mod{
+				Name:     name,
+				FileName: filename,
+				Side:     side,
+				Download: core.ModDownload{
+					URL:        downloadURL,
+					HashFormat: hashFormat,
+					Hash:       hash,
+				},
+				Update: updateMap,
+			}
+			path := modMeta.SetMetaPath(filepath.Join(viper.GetString("meta-folder-base"), folder, slug+core.MetaExtension))
+
+			format, hashOut, err := modMeta.Write()
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			err = index.RefreshFileWithHash(path, format, hashOut, true)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			if err = core.CommitChanges(&index, &pack); err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+
+			fmt.Printf("Project \"%s\" successfully added! (%s) [offline]\n", name, filename)
+			return
+		}
+
 		// If project/version IDs/version file name is provided in command line, use those
 		var projectID, versionID, versionFilename string
 		if projectIDFlag != "" {
@@ -458,4 +544,14 @@ func init() {
 	installCmd.Flags().StringVar(&projectIDFlag, "project-id", "", "The Modrinth project ID to use")
 	installCmd.Flags().StringVar(&versionIDFlag, "version-id", "", "The Modrinth version ID to use")
 	installCmd.Flags().StringVar(&versionFilenameFlag, "version-filename", "", "The Modrinth version filename to use")
+
+	// Offline metadata flags
+	installCmd.Flags().String("name", "", "Project display name (required with --offline)")
+	installCmd.Flags().String("filename", "", "Download filename (required with --offline)")
+	installCmd.Flags().String("url", "", "Direct download URL (required with --offline)")
+	installCmd.Flags().String("hash", "", "File hash value (required with --offline)")
+	installCmd.Flags().String("hash-format", "", "Hash algorithm: sha512, sha256, sha1 (required with --offline)")
+	installCmd.Flags().String("side", "both", "Side: client, server, both")
+	installCmd.Flags().String("slug", "", "Project slug for .pw.toml path (default: slugify of name)")
+	installCmd.Flags().String("project-type", "mod", "Project type for folder routing: mod, resourcepack, shader, datapack")
 }
