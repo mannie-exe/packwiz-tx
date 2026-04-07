@@ -3,7 +3,7 @@ package cmdshared
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/packwiz/packwiz/core"
+	"github.com/mannie-exe/packwiz-tx/core"
 	"os"
 	"sort"
 	"time"

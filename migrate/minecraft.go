@@ -2,9 +2,9 @@ package migrate
 
 import (
 	"fmt"
-	packCmd "github.com/packwiz/packwiz/cmd"
-	"github.com/packwiz/packwiz/cmdshared"
-	"github.com/packwiz/packwiz/core"
+	packCmd "github.com/mannie-exe/packwiz-tx/cmd"
+	"github.com/mannie-exe/packwiz-tx/cmdshared"
+	"github.com/mannie-exe/packwiz-tx/core"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
