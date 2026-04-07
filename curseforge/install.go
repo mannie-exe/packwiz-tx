@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 
@@ -40,6 +41,88 @@ var installCmd = &cobra.Command{
 			fmt.Println(err)
 			os.Exit(1)
 		}
+
+		if viper.GetBool("offline") {
+			name, _ := cmd.Flags().GetString("name")
+			filename, _ := cmd.Flags().GetString("filename")
+			hash, _ := cmd.Flags().GetString("hash")
+			hashFormat, _ := cmd.Flags().GetString("hash-format")
+			slug, _ := cmd.Flags().GetString("slug")
+			classID, _ := cmd.Flags().GetUint32("class-id")
+
+			if name == "" || filename == "" || hash == "" || hashFormat == "" {
+				fmt.Println("--offline requires: --name, --filename, --hash, --hash-format")
+				os.Exit(1)
+			}
+			if addonIDFlag == 0 {
+				fmt.Println("--offline requires --addon-id")
+				os.Exit(1)
+			}
+			if fileIDFlag == 0 {
+				fmt.Println("--offline requires --file-id")
+				os.Exit(1)
+			}
+
+			if slug == "" {
+				slug = core.SlugifyName(name)
+			}
+
+			updateMap := make(map[string]map[string]interface{})
+			updateMap["curseforge"], err = cfUpdateData{
+				ProjectID: addonIDFlag,
+				FileID:    fileIDFlag,
+			}.ToMap()
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+
+			folder := viper.GetString("meta-folder")
+			if folder == "" {
+				switch classID {
+				case 12:
+					folder = "resourcepacks"
+				case 6552:
+					folder = "shaderpacks"
+				case 6945:
+					folder = "datapacks"
+				default:
+					folder = "mods"
+				}
+			}
+
+			modMeta := core.Mod{
+				Name:     name,
+				FileName: filename,
+				Side:     core.UniversalSide,
+				Download: core.ModDownload{
+					HashFormat: hashFormat,
+					Hash:       hash,
+					Mode:       core.ModeCF,
+				},
+				Update: updateMap,
+			}
+			path := modMeta.SetMetaPath(filepath.Join(viper.GetString("meta-folder-base"), folder, slug+core.MetaExtension))
+
+			format, hashOut, err := modMeta.Write()
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			err = index.RefreshFileWithHash(path, format, hashOut, true)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			if err = core.CommitChanges(&index, &pack); err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+
+			fmt.Printf("Project \"%s\" successfully added! (%s) [offline]\n", name, filename)
+			return
+		}
+
 		mcVersions, err := pack.GetSupportedMCVersions()
 		if err != nil {
 			fmt.Println(err)
@@ -440,4 +523,12 @@ func init() {
 	installCmd.Flags().Uint32Var(&fileIDFlag, "file-id", 0, "The CurseForge file ID to use")
 	installCmd.Flags().StringVar(&gameFlag, "game", "minecraft", "The game to add files from (slug, as stored in URLs); the game in the URL takes precedence")
 	installCmd.Flags().StringVar(&categoryFlag, "category", "", "The category to add files from (slug, as stored in URLs); the category in the URL takes precedence")
+
+	// Offline metadata flags
+	installCmd.Flags().String("name", "", "Project display name (required with --offline)")
+	installCmd.Flags().String("filename", "", "Download filename (required with --offline)")
+	installCmd.Flags().String("hash", "", "File hash value (required with --offline)")
+	installCmd.Flags().String("hash-format", "", "Hash algorithm (required with --offline)")
+	installCmd.Flags().String("slug", "", "Project slug for .pw.toml path (default: slugify of name)")
+	installCmd.Flags().Uint32("class-id", 6, "CurseForge classId for folder routing (default: 6 = mod)")
 }
