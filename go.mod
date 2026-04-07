@@ -1,4 +1,4 @@
-module github.com/packwiz/packwiz
+module github.com/mannie-exe/packwiz-tx
 
 require (
 	github.com/BurntSushi/toml v1.5.0

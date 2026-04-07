@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/packwiz/packwiz/core"
+	"github.com/mannie-exe/packwiz-tx/core"
 	"github.com/spf13/pflag"
 	"os"
 	"path/filepath"

@@ -2,14 +2,14 @@ package main
 
 import (
 	// Modules of packwiz
-	"github.com/packwiz/packwiz/cmd"
-	_ "github.com/packwiz/packwiz/curseforge"
-	_ "github.com/packwiz/packwiz/github"
-	_ "github.com/packwiz/packwiz/migrate"
-	_ "github.com/packwiz/packwiz/modrinth"
-	_ "github.com/packwiz/packwiz/settings"
-	_ "github.com/packwiz/packwiz/url"
-	_ "github.com/packwiz/packwiz/utils"
+	"github.com/mannie-exe/packwiz-tx/cmd"
+	_ "github.com/mannie-exe/packwiz-tx/curseforge"
+	_ "github.com/mannie-exe/packwiz-tx/github"
+	_ "github.com/mannie-exe/packwiz-tx/migrate"
+	_ "github.com/mannie-exe/packwiz-tx/modrinth"
+	_ "github.com/mannie-exe/packwiz-tx/settings"
+	_ "github.com/mannie-exe/packwiz-tx/url"
+	_ "github.com/mannie-exe/packwiz-tx/utils"
 )
 
 func main() {

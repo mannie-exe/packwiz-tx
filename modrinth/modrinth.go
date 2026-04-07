@@ -10,8 +10,8 @@ import (
 	"slices"
 
 	modrinthApi "codeberg.org/jmansfield/go-modrinth/modrinth"
-	"github.com/packwiz/packwiz/cmd"
-	"github.com/packwiz/packwiz/core"
+	"github.com/mannie-exe/packwiz-tx/cmd"
+	"github.com/mannie-exe/packwiz-tx/core"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/unascribed/FlexVer/go/flexver"
