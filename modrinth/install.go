@@ -62,8 +62,10 @@ var installCmd = &cobra.Command{
 			if slug == "" {
 				slug = core.SlugifyName(name)
 			}
-			if side == "" {
-				side = core.UniversalSide
+			validSides := map[string]bool{"server": true, "client": true, "both": true}
+			if !validSides[side] {
+				fmt.Printf("--side must be one of: client, server, both (got %q)\n", side)
+				os.Exit(1)
 			}
 
 			updateMap := make(map[string]map[string]interface{})
