@@ -1,3 +1,13 @@
+> **packwiz-tx** is a fork of [packwiz/packwiz](https://github.com/packwiz/packwiz) maintained
+> by [@mannie-exe](https://github.com/mannie-exe) for use with [empack](https://github.com/inherent-design/empack).
+>
+> It adds a global `--no-refresh` flag that defers `index.toml` and `pack.toml` writes,
+> enabling batch add/remove operations without O(n) index rebuilds. Run `packwiz refresh`
+> after batch operations to finalize.
+>
+> All other behavior is identical to upstream packwiz. Contributions are welcome; the goal
+> is to upstream `--no-refresh` once validated.
+
 # packwiz
 packwiz is a command line tool for creating Minecraft modpacks. Instead of managing JAR files directly, packwiz creates TOML metadata files which can be easily version-controlled and shared with git (see an example pack [here](https://github.com/packwiz/packwiz-example-pack)). You can then [export it to a CurseForge or Modrinth modpack](https://packwiz.infra.link/tutorials/hosting/curseforge/), or [use packwiz-installer](https://packwiz.infra.link/tutorials/installing/packwiz-installer/) for an auto-updating MultiMC instance.
 

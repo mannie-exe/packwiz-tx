@@ -153,6 +153,23 @@ func (pack Pack) Write() error {
 	return f.Close()
 }
 
+// CommitChanges persists the index and pack files to disk.
+// When the global --no-refresh flag is set, this is a no-op;
+// .pw.toml files remain on disk but the index is not rebuilt.
+// Run packwiz refresh to finalize after batch operations.
+func CommitChanges(index *Index, pack *Pack) error {
+	if viper.GetBool("no-refresh") {
+		return nil
+	}
+	if err := index.Write(); err != nil {
+		return err
+	}
+	if err := pack.UpdateIndexHash(); err != nil {
+		return err
+	}
+	return pack.Write()
+}
+
 // GetMCVersion gets the version of Minecraft this pack uses, if it has been correctly specified
 func (pack Pack) GetMCVersion() (string, error) {
 	mcVersion, ok := pack.Versions["minecraft"]

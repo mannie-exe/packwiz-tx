@@ -75,6 +75,11 @@ func init() {
 	var nonInteractive bool
 	rootCmd.PersistentFlags().BoolVarP(&nonInteractive, "yes", "y", false, "Accept all prompts with the default or \"yes\" option (non-interactive mode) - may pick unwanted options in search results")
 	_ = viper.BindPFlag("non-interactive", rootCmd.PersistentFlags().Lookup("yes"))
+
+	var noRefresh bool
+	rootCmd.PersistentFlags().BoolVar(&noRefresh, "no-refresh", false,
+		"Skip index and pack.toml refresh after modifications (use 'packwiz refresh' to finalize batch operations)")
+	_ = viper.BindPFlag("no-refresh", rootCmd.PersistentFlags().Lookup("no-refresh"))
 }
 
 // initConfig reads in config file and ENV variables if set.

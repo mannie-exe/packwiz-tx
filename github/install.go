@@ -204,16 +204,7 @@ func installRelease(repo Repo, release Release, regex string, pack core.Pack) er
 	if err != nil {
 		return err
 	}
-	err = index.Write()
-	if err != nil {
-		return err
-	}
-	err = pack.UpdateIndexHash()
-	if err != nil {
-		return err
-	}
-	err = pack.Write()
-	if err != nil {
+	if err = core.CommitChanges(&index, &pack); err != nil {
 		return err
 	}
 

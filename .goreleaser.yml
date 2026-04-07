@@ -9,6 +9,10 @@ builds:
       - linux
       - windows
       - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags: -s -w
 checksum:
   name_template: 'checksums.txt'
 snapshot:
