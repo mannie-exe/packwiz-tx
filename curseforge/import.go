@@ -353,7 +353,18 @@ var importCmd = &cobra.Command{
 			fmt.Println("No files copied!")
 		}
 
-		if err = core.CommitChanges(&index, &pack); err != nil {
+		err = index.Write()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		err = pack.UpdateIndexHash()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		err = pack.Write()
+		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
