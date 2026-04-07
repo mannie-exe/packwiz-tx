@@ -56,7 +56,7 @@ func TestCommitChangesWritesWhenNoRefreshFalse(t *testing.T) {
 	index, pack, dir := setupTestPack(t)
 
 	viper.Set("no-refresh", false)
-	defer viper.Set("no-refresh", nil)
+	t.Cleanup(func() { viper.Set("no-refresh", nil) })
 
 	index.HashFormat = "sha512"
 
@@ -78,7 +78,7 @@ func TestCommitChangesSkipsWhenNoRefreshTrue(t *testing.T) {
 	index, pack, dir := setupTestPack(t)
 
 	viper.Set("no-refresh", true)
-	defer viper.Set("no-refresh", nil)
+	t.Cleanup(func() { viper.Set("no-refresh", nil) })
 
 	index.HashFormat = "sha512"
 
@@ -100,6 +100,7 @@ func TestCommitChangesDefaultsToWrite(t *testing.T) {
 	index, pack, dir := setupTestPack(t)
 
 	viper.Set("no-refresh", nil)
+	t.Cleanup(func() { viper.Set("no-refresh", nil) })
 
 	index.HashFormat = "sha512"
 
