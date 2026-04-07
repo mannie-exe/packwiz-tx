@@ -1,0 +1,8 @@
+packwiz-tx
+==========
+This software is based on packwiz (https://github.com/packwiz/packwiz).
+Copyright (c) 2019, MIT License.
+
+The --no-refresh flag and core.CommitChanges() helper were added by
+inherent.design LLC for batch operation support in empack
+(https://github.com/inherent-design/empack).

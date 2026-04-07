@@ -80,21 +80,8 @@ var rehashCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		err = index.Write()
-		if err != nil {
-			fmt.Printf("Error writing index: %v\n", err)
-			os.Exit(1)
-		}
-
-		err = pack.UpdateIndexHash()
-		if err != nil {
-			fmt.Printf("Error updating index hash: %v\n", err)
-			os.Exit(1)
-		}
-
-		err = pack.Write()
-		if err != nil {
-			fmt.Printf("Error writing pack: %v\n", err)
+		if err = core.CommitChanges(&index, &pack); err != nil {
+			fmt.Printf("Error committing changes: %v\n", err)
 			os.Exit(1)
 		}
 	},
