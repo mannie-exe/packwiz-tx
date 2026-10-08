@@ -8,7 +8,7 @@ import (
 	"slices"
 	"strings"
 
-	modrinthApi "codeberg.org/jmansfield/go-modrinth/modrinth"
+	modrinthApi "codeberg.org/theepicblock/go-modrinth/modrinth"
 	"github.com/mannie-exe/packwiz-tx/cmdshared"
 	"github.com/spf13/viper"
 
@@ -488,9 +488,17 @@ func createFileMeta(project *modrinthApi.Project, version *modrinthApi.Version, 
 		return err
 	}
 
-	side := getSide(project)
+	side := getSide(version)
+	if side == "either" {
+		fmt.Println("Warning: Project (" + getNiceName(project) + ") is marked for both server and client. This project has indicated that one of these is unnecessary. You may want to manually set this to either server or client depending on preference")
+		side = core.UniversalSide
+	}
 	if side == "" {
-		fmt.Println("Warning: Project doesn't have a side that's supported; assuming universal. Server: " + *project.ServerSide + " Client: " + *project.ClientSide)
+		environment := "<missing>"
+		if version.Environment != nil {
+			environment = *version.Environment
+		}
+		fmt.Printf("Warning: Project (%s) has unknown environment %q; marking it for both client and server\n", getNiceName(project), environment)
 		side = core.UniversalSide
 	}
 

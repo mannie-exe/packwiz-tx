@@ -5,8 +5,13 @@
 > enabling batch add/remove operations without O(n) index rebuilds. Run `packwiz refresh`
 > after batch operations to finalize.
 >
-> All other behavior is identical to upstream packwiz. Contributions are welcome; the goal
-> is to upstream `--no-refresh` once validated.
+> `--offline` also writes explicitly supplied provider metadata without repeating API
+> resolution. The caller supplies exact IDs, file evidence and Modrinth side, and owns dependency
+> resolution. These options do not make an empack operation transactional.
+>
+> v0.2.1 incorporates upstream main through `ef87d96`, including version-level Modrinth
+> environments and the GitHub no-release diagnostic. It retains both fork options and
+> corrects missing-environment handling and the combined client/server optional cases.
 
 # packwiz
 packwiz is a command line tool for creating Minecraft modpacks. Instead of managing JAR files directly, packwiz creates TOML metadata files which can be easily version-controlled and shared with git (see an example pack [here](https://github.com/packwiz/packwiz-example-pack)). You can then [export it to a CurseForge or Modrinth modpack](https://packwiz.infra.link/tutorials/hosting/curseforge/), or [use packwiz-installer](https://packwiz.infra.link/tutorials/installing/packwiz-installer/) for an auto-updating MultiMC instance.
