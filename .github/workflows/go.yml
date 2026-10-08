@@ -17,7 +17,10 @@ jobs:
         with:
           go-version: stable
       - run: go build ./...
-      - run: go test ./...
+      - run: go test -race ./...
+      - run: go vet ./...
+      - run: go build -o /tmp/packwiz-tx .
+      - run: python3 scripts/offline-smoke.py /tmp/packwiz-tx
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -57,4 +60,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: packwiz-snapshot
-          path: dist/packwiz_*/
+          path: dist/packwiz-tx_*/
