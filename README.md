@@ -1,7 +1,19 @@
-> **packwiz-tx** is a fork of [packwiz/packwiz](https://github.com/packwiz/packwiz) maintained
+# packwiz-tx (archived)
+
+This repository is archived and is no longer maintained. The fork was maintained
+for [empack](https://github.com/inherent-design/empack), which no longer depends on
+packwiz or packwiz-tx. No further releases or fixes are planned for this fork.
+
+The source and release history remain available for reference. For packwiz
+maintenance and development, see the independent upstream
+[packwiz project](https://github.com/packwiz/packwiz).
+
+## Fork history
+
+> **packwiz-tx** was a fork of [packwiz/packwiz](https://github.com/packwiz/packwiz) maintained
 > by [@mannie-exe](https://github.com/mannie-exe) for use with [empack](https://github.com/inherent-design/empack).
 >
-> It adds a global `--no-refresh` flag that defers `index.toml` and `pack.toml` writes,
+> It added a global `--no-refresh` flag that defers `index.toml` and `pack.toml` writes,
 > enabling batch add/remove operations without O(n) index rebuilds. Run `packwiz refresh`
 > after batch operations to finalize.
 >
